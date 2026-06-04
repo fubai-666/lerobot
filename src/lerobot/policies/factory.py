@@ -46,6 +46,7 @@ from lerobot.utils.feature_utils import dataset_to_policy_features
 
 from .act.configuration_act import ACTConfig
 from .couette_act.configuration_couette_act import CouetteACTConfig
+from .couette_pi0.configuration_couette_pi0 import CouettePI0Config
 from .diffusion.configuration_diffusion import DiffusionConfig
 from .eo1.configuration_eo1 import EO1Config
 from .gaussian_actor.configuration_gaussian_actor import GaussianActorConfig
@@ -126,6 +127,10 @@ def get_policy_class(name: str) -> type[PreTrainedPolicy]:
         from .pi0.modeling_pi0 import PI0Policy
 
         return PI0Policy
+    elif name == "couette_pi0":
+        from .couette_pi0.modeling_couette_pi0 import CouettePI0Policy
+
+        return CouettePI0Policy
     elif name == "pi0_fast":
         from .pi0_fast.modeling_pi0_fast import PI0FastPolicy
 
@@ -202,6 +207,8 @@ def make_policy_config(policy_type: str, **kwargs) -> PreTrainedConfig:
         return VQBeTConfig(**kwargs)
     elif policy_type == "pi0":
         return PI0Config(**kwargs)
+    elif policy_type == "couette_pi0":
+        return CouettePI0Config(**kwargs)
     elif policy_type == "pi05":
         return PI05Config(**kwargs)
     elif policy_type == "gaussian_actor":
@@ -377,6 +384,14 @@ def make_pre_post_processors(
         from .pi0.processor_pi0 import make_pi0_pre_post_processors
 
         processors = make_pi0_pre_post_processors(
+            config=policy_cfg,
+            dataset_stats=kwargs.get("dataset_stats"),
+        )
+
+    elif isinstance(policy_cfg, CouettePI0Config):
+        from .couette_pi0.processor_couette_pi0 import make_couette_pi0_pre_post_processors
+
+        processors = make_couette_pi0_pre_post_processors(
             config=policy_cfg,
             dataset_stats=kwargs.get("dataset_stats"),
         )
